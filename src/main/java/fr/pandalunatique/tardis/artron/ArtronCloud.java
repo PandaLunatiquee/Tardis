@@ -12,9 +12,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class ArtronCloud implements Listener {
@@ -36,9 +39,24 @@ public class ArtronCloud implements Listener {
             as.setCanPickupItems(false);
             as.setSmall(true);
             as.setInvulnerable(true);
+            Arrays.stream(EquipmentSlot.values()).forEach(slot -> {
+                as.addEquipmentLock(slot, ArmorStand.LockType.REMOVING_OR_CHANGING);
+            });
             int r2 = rnd.nextInt(5);
             as.setCustomName("Artron-" + String.valueOf(r2));
         }
+    }
+
+    @EventHandler
+    public void onChunkUnload(ChunkUnloadEvent e) {
+        for (Entity entity : e.getChunk().getEntities()) {
+            if (entity.getType() == EntityType.ARMOR_STAND) {
+                if (entity.getCustomName().contains("Artron")) {
+                    entity.remove();
+                }
+            }
+        }
+
     }
 
     @EventHandler
