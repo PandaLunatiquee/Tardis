@@ -2,3 +2,4 @@ name: "Tardis"
 description: "Tardis"
 version: "1.0.0"
 main: fr.pandalunatique.tardis.TardisPlugin
+api-version: 1.16
