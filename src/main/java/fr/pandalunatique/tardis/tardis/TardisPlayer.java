@@ -1,4 +1,4 @@
-package fr.pandalunatique.tardis;
+package fr.pandalunatique.tardis.tardis;
 
 import org.bukkit.entity.Player;
 

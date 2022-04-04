@@ -1,0 +1,6 @@
+name: "§9Tardis"
+description: "Now it's your turn to be the Doctor!"
+authors: ["§6§lPandaLunatique", "§6§lYAYOH", "§6§lStayZe"]
+version: "1.0.0"
+api-version: 1.15
+main: "fr.pandalunatiquee.tardis.TardisPlugin"
