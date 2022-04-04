@@ -1,12 +1,16 @@
 package fr.pandalunatique.tardis;
 
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.sql.*;
+import java.util.Arrays;
 import java.util.Set;
 
 public class Database {
@@ -14,6 +18,7 @@ public class Database {
     private static Database instance;
     private Connection conn;
     private String path;
+    private ArmorStand a;
 
     private Database() {
 

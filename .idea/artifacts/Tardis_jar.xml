@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Tardis:jar">
+    <output-path>$USER_HOME$/Documents/Projets/Tardis</output-path>
+    <root id="archive" name="Tardis.jar">
+      <element id="module-output" name="Tardis" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/plugin.yml" />
+      <element id="library" level="project" name="Maven: org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT" />
+    </root>
+  </artifact>
+</component>
