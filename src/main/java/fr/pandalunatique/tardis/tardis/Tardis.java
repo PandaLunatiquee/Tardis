@@ -26,7 +26,7 @@ public class Tardis {
     private ObjectUtils.Null tardisRooms;
 
     private TardisSkin tardisSkin;
-    private TardisCamouflage tardisCamouflage;
+    private TardisChameleon tardisChameleon;
 
     private int tardisLevel;
     private int tardisCurrentXp;
@@ -40,7 +40,7 @@ public class Tardis {
         this.isFreeFlying = false;
         this.chameleonCircuitEnabled = false;
         this.tardisSkin = TardisSkin.DEFAULT;
-        this.tardisCamouflage = TardisCamouflage.NONE;
+        this.tardisChameleon = TardisChameleon.NONE;
         this.tardisLevel = 0;
         this.tardisCurrentXp = 0;
     }
