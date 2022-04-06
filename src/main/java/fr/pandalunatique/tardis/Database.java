@@ -1,6 +1,7 @@
 package fr.pandalunatique.tardis;
 
 
+import fr.pandalunatique.tardis.tardis.TardisPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.ArmorStand;
 
