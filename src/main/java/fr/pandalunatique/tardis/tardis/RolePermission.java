@@ -6,6 +6,5 @@ public enum RolePermission {
     CAN_SET_COORDINATES,
     CAN_SET_DIMENSION,
     CAN_TRAVEL,
-    CAN_MANAGE_ROOMS,
-
+    CAN_MANAGE_ROOMS
 }

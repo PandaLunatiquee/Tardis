@@ -1,16 +1,15 @@
 package fr.pandalunatique.tardis.tardis.rooms;
 
-public class BatteryRoom extends Room {
+public class BatteryRoom {
 
-    private int battery;
+    enum Rooms {
 
-    public BatteryRoom(String name, int initCost, int timeCost, int batteryStorage) {
-        super(name, initCost, timeCost);
-        this.battery = batteryStorage;
-    }
-
-    @Override
-    public void printName() {
+        SMALL_BATTERY, // Store 250 energies
+        MEDIUM_BATTERY, // Store 1000 energies
+        LARGE_BATTERY, // Store 4500 energies
+        ENGINE, // Store 1000 energies
+        ECOLOGICAL_ENGINE, // Store 250 energies
+        TARDIS_CORE // Store 100000 energies
 
     }
 

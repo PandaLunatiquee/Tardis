@@ -1,7 +1,9 @@
 package fr.pandalunatique.tardis.tardis;
 
 import fr.pandalunatique.tardis.Database;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -9,23 +11,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import java.sql.ResultSet;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class TardisPlayer implements Listener {
 
     private final UUID uuid;
     private final int level;
     private final int experience;
 
-    @Getter @Setter private boolean isCool;
-
     //private Set<TardisBlueprint> unlockedBlueprints;
-
-    public TardisPlayer(UUID uuid, int lvl, int xp) {
-        this.uuid = uuid;
-        this.level = lvl;
-        this.experience = xp;
-    }
 
     public static TardisPlayer fromDatabase(UUID uuid) {
 
@@ -53,5 +49,8 @@ public class TardisPlayer implements Listener {
 
     @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent e) {
+
+
+
     }
 }
