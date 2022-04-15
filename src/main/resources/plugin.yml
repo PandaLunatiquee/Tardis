@@ -1,5 +1,5 @@
 name: "Tardis"
 description: "Tardis"
 version: "1.0.0"
-main: fr.pandalunatique.tardis.TardisPlugin
+main: fr.pandalunatique.tardisplugin.TardisPlugin
 api-version: 1.16
