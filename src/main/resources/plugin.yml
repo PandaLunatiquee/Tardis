@@ -1,5 +1,6 @@
 name: "Tardis"
-description: "Tardis"
+description: "§9Now it's your turn to be the §6Doctor§9!"
+authors: ["§b§lPandaLunatique", "§c§lYAYOH", "§6§lStayZe"]
 version: "1.0.0"
 main: fr.pandalunatique.tardis.TardisPlugin
 api-version: 1.16

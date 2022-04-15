@@ -84,9 +84,9 @@ public class ArtronCloud implements Listener {
     }
 
     public Location findSurface(Location loc){
-        loc.setY(1);
+        loc.setY(255);
         while (loc.getBlock().getType() != Material.AIR) {
-            loc.setY(loc.getY() + 1);
+            loc.setY(loc.getY() - 1);
         }
         return loc;
     }

@@ -1,6 +1,7 @@
 package fr.pandalunatique.tardis;
 
 import fr.pandalunatique.tardis.artron.ArtronCloudLoop;
+import fr.pandalunatique.tardis.tardis.tools.Scanner;
 import org.bukkit.Bukkit;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
@@ -10,7 +11,6 @@ import fr.pandalunatique.tardis.artron.ArtronCloud;
 public class TardisPlugin extends JavaPlugin {
 
     private static TardisPlugin instance;
-
 
     @Override
     public void onEnable() {
@@ -33,17 +33,17 @@ public class TardisPlugin extends JavaPlugin {
         if(!getDataFolder().exists()) getDataFolder().mkdir();
 
         // Connect to database and check if connection if valid, otherwise disable the plugin
-        if(!Database.getInstance().canConnect()) Bukkit.getPluginManager().disablePlugin(this);
+        //if(!Database.getInstance().canConnect()) Bukkit.getPluginManager().disablePlugin(this);
         instance = this;
 
-        WorldCreator wc = new WorldCreator("Tardis");
-        wc.generator(new fr.pandalunatique.tardis.TardisWorldGenerator());
-        wc.createWorld();
+        //WorldCreator wc = new WorldCreator("Tardis");
+        //wc.generator(new fr.pandalunatique.tardis.TardisWorldGenerator());
+        //wc.createWorld();
 
         //Arton system
-        getServer().getPluginManager().registerEvents(new ArtronCloud(), this);
-        ArtronCloudLoop acl = new ArtronCloudLoop();
-        acl.start();
+        getServer().getPluginManager().registerEvents(new Scanner(), this);
+        //ArtronCloudLoop acl = new ArtronCloudLoop();
+        //acl.start();
 
     }
 

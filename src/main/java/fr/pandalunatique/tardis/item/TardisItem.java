@@ -1,9 +1,9 @@
-package fr.pandalunatique.tardis.items;
+package fr.pandalunatique.tardis.item;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-public class TardisItems {
+public class TardisItem {
 
     enum Items {
 
