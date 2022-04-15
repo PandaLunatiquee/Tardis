@@ -3,6 +3,8 @@ package fr.pandalunatique.tardisplugin.util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.util.Vector;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -28,6 +30,24 @@ public class LocationLib {
         //TODO: Check for exceptions
 
         return location;
+
+    }
+
+    public static Location reachSurfaceFromTop(Location location) {
+
+        Location l = location.clone();
+        l.setY(255);
+
+        while(l.getY() >= 0) {
+
+            if(!l.getBlock().getType().equals(Material.AIR)) {
+                l.setY(l.getY() + 1);
+                return l;
+            }
+            l.setY(l.getY() - 1);
+        }
+
+        return null;
 
     }
 
