@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 public enum Visual {
 
     ARTRON_CLOUD_VISUAL(ArtronCloudVisual.class);
+    FORCE_FIELD_VISUAL(ForceFieldVisual.class);
 
     private final Class<?> clazz;
     private final Method getVisualRunnable;

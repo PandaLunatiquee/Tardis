@@ -1,11 +1,8 @@
 package fr.pandalunatique.tardisplugin;
 
-import fr.pandalunatique.tardisplugin.event.TemporaryEvents;
+import fr.pandalunatique.tardisplugin.event.*;
 import fr.pandalunatique.tardisplugin.player.tool.forcefield.ForceField;
 import fr.pandalunatique.tardisplugin.visual.ArtronCloudVisual;
-import fr.pandalunatique.tardisplugin.event.ChunkLoadUnloadListener;
-import fr.pandalunatique.tardisplugin.event.ConnectionHandleListener;
-import fr.pandalunatique.tardisplugin.event.ItemCraftListener;
 import fr.pandalunatique.tardisplugin.item.TardisCraft;
 import fr.pandalunatique.tardisplugin.item.TardisItem;
 import fr.pandalunatique.tardisplugin.visual.VisualManager;
@@ -45,6 +42,9 @@ public class TardisPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ConnectionHandleListener(), this);
         Bukkit.getPluginManager().registerEvents(new ItemCraftListener(), this);
         Bukkit.getPluginManager().registerEvents(new ChunkLoadUnloadListener(), this);
+        Bukkit.getPluginManager().registerEvents(new InteractListener(), this);
+        Bukkit.getPluginManager().registerEvents(new EntityDamageListener(), this);
+        Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
 
         // Registering custom items and recipes
         for(TardisCraft craft : TardisCraft.values()) {
@@ -59,7 +59,6 @@ public class TardisPlugin extends JavaPlugin {
 
         // TEMPORARY EVENT REGISTERING
         Bukkit.getPluginManager().registerEvents(new TemporaryEvents(), this);
-        Bukkit.getPluginManager().registerEvents(new ForceField(), this);
 
         Bukkit.getOnlinePlayers().forEach(player -> {
             player.getInventory().addItem(TardisItem.FORCE_FIELD.getItemStack());

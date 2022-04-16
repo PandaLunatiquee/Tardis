@@ -19,12 +19,12 @@ import java.util.List;
 
 public class ForceFieldGenerator {
 
-    BukkitTask task = null;
-    Boolean stateShield;
-    Inventory inv;
-    Location loc;
-    int artronEnergy;
-    int timer = 0;
+    public BukkitTask task = null;
+    public Boolean stateShield;
+    public Inventory inv;
+    public Location loc;
+    public int artronEnergy;
+    public int timer = 0;
 
     public void init(Location l) {
         loc = l;
