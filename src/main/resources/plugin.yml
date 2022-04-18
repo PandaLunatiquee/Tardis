@@ -3,3 +3,6 @@ description: "Tardis"
 version: "1.0.0"
 main: fr.pandalunatique.tardisplugin.TardisPlugin
 api-version: 1.16
+commands:
+  tgive:
+    description: "Temporary give command"

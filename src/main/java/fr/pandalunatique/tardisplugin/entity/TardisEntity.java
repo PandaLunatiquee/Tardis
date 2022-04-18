@@ -9,4 +9,5 @@ public class TardisEntity {
     public UUID getModelUUID() { return UUID.randomUUID(); }
     public UUID getEntityUUID() { return UUID.randomUUID(); }
     public TardisEntityType getType() { return type; }
+
 }

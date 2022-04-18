@@ -2,8 +2,10 @@ package fr.pandalunatique.tardisplugin.util;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
 import java.lang.reflect.Type;
@@ -48,6 +50,34 @@ public class LocationLib {
         }
 
         return null;
+
+    }
+
+    public static boolean checkFreeSpace(Location center, int dx, int dz, int dy) {
+
+        Location check = center.getBlock().getLocation();
+
+        for(int y = 0; y < dy; y++) {
+
+            check.setY(center.getY() + y);
+
+            for(int x = 0; x <= dx; x++) {
+
+                check.setX(center.getX() - ((double) dx / 2 - x));
+
+                for(int z = 0; z <= dz; z++) {
+
+                    check.setZ(center.getZ() - ((double) dz / 2 - z));
+
+                    if(!check.getBlock().getType().equals(Material.AIR)) return false;
+
+                }
+
+            }
+
+        }
+
+        return true;
 
     }
 

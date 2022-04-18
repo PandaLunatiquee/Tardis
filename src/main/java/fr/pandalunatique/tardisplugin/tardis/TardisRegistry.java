@@ -2,10 +2,9 @@ package fr.pandalunatique.tardisplugin.tardis;
 
 import fr.pandalunatique.tardisplugin.player.TardisPlayer;
 import fr.pandalunatique.tardisplugin.player.TardisPlayerRegistry;
+import org.bukkit.Location;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TardisRegistry {
 
@@ -25,6 +24,21 @@ public class TardisRegistry {
             instance = new TardisRegistry();
         }
         return instance;
+
+    }
+
+    public Set<Tardis> getNearbyTardis(Location location, double d) {
+
+        Set<Tardis> nearby = new HashSet<>();
+
+        this.registry.forEach((__, tardis) -> {
+
+            if(tardis.getTardisLocation().distance(location) <= d) {
+                nearby.add(tardis);
+            }
+        });
+
+        return nearby;
 
     }
 

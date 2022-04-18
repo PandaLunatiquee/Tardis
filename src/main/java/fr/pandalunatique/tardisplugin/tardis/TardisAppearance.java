@@ -1,38 +1,42 @@
 package fr.pandalunatique.tardisplugin.tardis;
 
+import fr.pandalunatique.tardisplugin.util.BooleanStorable;
+
 // Aesthetic Skin List
-public enum TardisAppearance {
+public enum TardisAppearance implements BooleanStorable<TardisAppearance> {
 
-    DEFAULT((short) 0),
-    DOCTOR_VARIANT1((short) 1),
-    DOCTOR_VARIANT2((short) 2),
-    DOCTOR_VARIANT3((short) 3),
-    DOCTOR_VARIANT4((short) 4),
-    DOCTOR_VARIANT5((short) 5),
-    DOCTOR_VARIANT6((short) 6),
-    DOCTOR_VARIANT7((short) 7),
-    DOCTOR_VARIANT8((short) 8),
-    DOCTOR_VARIANT9((short) 9),
-    HALLOWEEN((short) 10),
-    XMAS((short) 11);
+    DEFAULT(0),
+    DOCTOR_VARIANT1(1),
+    DOCTOR_VARIANT2(2),
+    DOCTOR_VARIANT3(3),
+    DOCTOR_VARIANT4(4),
+    DOCTOR_VARIANT5(5),
+    DOCTOR_VARIANT6(6),
+    DOCTOR_VARIANT7(7),
+    DOCTOR_VARIANT8(8),
+    DOCTOR_VARIANT9(9),
+    HALLOWEEN(10),
+    XMAS(11);
 
-    private final short id;
+    private final int bit;
 
-    private TardisAppearance(short id) {
-        this.id = id;
+    private TardisAppearance(int id) {
+        this.bit = id;
     }
 
-    public short getId() {
-        return this.id;
+    public int getBit() {
+        return this.bit;
     }
 
-    public static TardisAppearance valueOf(short id) {
+    public static TardisAppearance fromBit(int bit) {
+
         for(TardisAppearance appearance : values()) {
-            if(appearance.getId() == id) {
+            if(appearance.getBit() == bit) {
                 return appearance;
             }
         }
         return null;
+
     }
 
 }

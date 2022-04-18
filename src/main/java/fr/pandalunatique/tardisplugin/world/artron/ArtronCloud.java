@@ -3,39 +3,40 @@ package fr.pandalunatique.tardisplugin.world.artron;
 import fr.pandalunatique.tardisplugin.util.ChanceLib;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ArtronCloud {
 
     public static final int MAX_CLOUDS = 30;
-    public static final int SPAWN_CHANCE = 2; // IN PERCENT
-    public static final int VISUAL_REFRESH_RATE = 5; // Ticks
+    public static final int SPAWN_CHANCE = 1; // IN PERCENT
+    public static final int VISUAL_REFRESH_RATE = 8; // Ticks
     public static final int MIN_LIFETIME = 600; // 30 seconds in ticks
     public static final int MAX_LIFETIME = 2400; // 2 minutes in ticks
+    public static final double COLLECT_REACH = 4;
+    public static final double DANGER_REACH = 2;
 
     @Getter private final Location location;
     @Getter private final Chunk chunk;
     @Getter @Setter private int count;
     @Getter @Setter private int lifetime;
 
-    private static Set<ArtronCloud> clouds = new HashSet<>();
+    private static Map<Chunk, ArtronCloud> clouds = new HashMap<>();
 
     public ArtronCloud(Location location) {
-        this.location = location;
-        this.chunk = location.getChunk();
-        this.count = 1;
+        this(location, ChanceLib.randomInteger(1, 5));
 
     }
 
@@ -48,72 +49,104 @@ public class ArtronCloud {
 
     }
 
-    public static boolean addArtronCloud(ArtronCloud cloud) {
+    public static void addArtronCloud(ArtronCloud cloud) {
 
         if(getArtronCloudCount() < MAX_CLOUDS) {
-            clouds.add(cloud);
-            return true;
+            clouds.put(cloud.getChunk(), cloud);
         }
-        return false;
 
     }
 
     public static void removeArtronCloud(ArtronCloud cloud) {
 
-        clouds.remove(cloud);
+        removeInChunk(cloud.getChunk());
 
     }
 
-    public static void clearChunk(Chunk chunk) {
+    public void updateLifetime() {
 
-        clouds.forEach((cloud) -> {
-            if(cloud.getChunk().equals(chunk)) {
-                clouds.remove(cloud);
+        this.lifetime -= 1;
+        if(this.lifetime == 0) {
+            removeArtronCloud(this);
+        }
+
+    }
+
+    public static void removeInChunk(Chunk chunk) {
+
+        clouds.remove(chunk);
+
+    }
+
+    public void collectArtron() {
+
+        this.count -= 1;
+        if(this.count == 0) {
+            removeArtronCloud(this);
+        }
+
+    }
+
+    public static Set<ArtronCloud> getReachableArtronCloud(Player p) {
+
+        Set<ArtronCloud> result = new HashSet<>();
+
+        clouds.forEach((__, cl) -> {
+
+            if(p.getLocation().distance(cl.getLocation()) <= COLLECT_REACH) {
+
+                result.add(cl);
+
             }
+
         });
 
+        return result;
+
     }
 
-    public static Set<ArtronCloud> getArtronClouds() {
+    public static ArtronCloud getPlayerLookedArtronCloud(Player p) {
+
+        Chunk c = p.getLocation().getChunk();
+        Set<ArtronCloud> reachable = getReachableArtronCloud(p);
+
+        if(reachable.size() > 0) {
+
+            Location init = p.getEyeLocation();
+            Vector dir = init.getDirection();
+
+            for(ArtronCloud artron : reachable) {
+
+                Location current = init.clone();
+
+                for(int i = 0; i < (int) COLLECT_REACH; i++) {
+
+                    if(current.distance(artron.getLocation()) < 1) {
+
+                        return artron;
+
+                    }
+
+                    current.add(dir);
+
+                }
+
+            }
+
+            return null;
+
+        } else return null;
+
+    }
+
+    public static Map<Chunk, ArtronCloud> getArtronClouds() {
 
         return clouds;
 
     }
 
-    public static Set<ArtronCloud> getArtronClouds(Chunk chunk) {
-
-        return clouds.stream()
-                     .filter((cloud) -> cloud.getChunk().equals(chunk))
-                     .collect(Collectors.toSet());
-
-    }
-
     public static int getArtronCloudCount() {
         return clouds.size();
-    }
-
-    @EventHandler
-    public void onClickCloud(PlayerInteractAtEntityEvent e) {
-        Player p = e.getPlayer();
-        Entity entity = e.getRightClicked();
-        if (entity.getType() == EntityType.ARMOR_STAND) {
-            if (entity.getCustomName().contains("Artron")) {
-                if (p.getInventory().getItemInMainHand().getType() == Material.GLASS_BOTTLE) {
-                    int artronBottle = Integer.valueOf(entity.getCustomName().split("-")[1]);
-                    p.getInventory().addItem(new ItemStack(Material.HONEY_BOTTLE));
-                    artronBottle -= 1;
-                    ItemStack item = p.getInventory().getItemInMainHand();
-                    if (item.getAmount() > 1) item.setAmount(item.getAmount() - 1);
-                    else item = new ItemStack(Material.AIR);
-                    p.getInventory().setItemInMainHand(item);
-                    if (artronBottle <= 0) {
-                        entity.remove();
-                    }else {
-                        entity.setCustomName("Artron-" + artronBottle);
-                    }
-                }
-            }
-        }
     }
 
 }

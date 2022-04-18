@@ -1,6 +1,7 @@
 package fr.pandalunatique.tardisplugin.entity;
 
 public enum TardisEntityType {
+
     DALEK,
     THE_SILENCE,
     CYBERMAN,
@@ -14,4 +15,5 @@ public enum TardisEntityType {
     WEEPING_ANGEL,
     SONTARAN,
     JUDOON
+
 }

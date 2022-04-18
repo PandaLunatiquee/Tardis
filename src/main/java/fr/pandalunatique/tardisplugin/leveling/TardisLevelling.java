@@ -1,4 +1,4 @@
-package fr.pandalunatique.tardisplugin.levelling;
+package fr.pandalunatique.tardisplugin.leveling;
 
 public class TardisLevelling {
 

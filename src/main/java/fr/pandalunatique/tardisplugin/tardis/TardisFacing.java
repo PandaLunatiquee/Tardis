@@ -2,24 +2,24 @@ package fr.pandalunatique.tardisplugin.tardis;
 
 public enum TardisFacing {
 
-    EAST((short) 0),
-    SOUTH((short) 1),
-    WEST((short) 2),
-    NORTH((short) 3);
+    EAST(0),
+    SOUTH(1),
+    WEST(2),
+    NORTH(3);
 
-    private final short id;
+    private final int id;
 
-    private TardisFacing(short id) {
+    private TardisFacing(int id) {
         this.id = id;
     }
 
-    public short getId() {
+    public int getBit() {
         return id;
     }
 
-    public static TardisFacing valueOf(short id) {
+    public static TardisFacing valueOf(int id) {
         for (TardisFacing facing : values()) {
-            if (facing.getId() == id) {
+            if (facing.getBit() == id) {
                 return facing;
             }
         }

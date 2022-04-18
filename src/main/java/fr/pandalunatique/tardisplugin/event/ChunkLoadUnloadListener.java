@@ -26,7 +26,7 @@ public class ChunkLoadUnloadListener implements Listener {
             Location location = LocationLib.reachSurfaceFromTop(randomBlock);
             if(location != null) {
 
-                ArtronCloud cloud = new ArtronCloud(location, ChanceLib.randomInteger(1, 3));
+                ArtronCloud cloud = new ArtronCloud(location);
                 ArtronCloud.addArtronCloud(cloud);
 
             }
@@ -37,7 +37,7 @@ public class ChunkLoadUnloadListener implements Listener {
 
     @EventHandler
     public void onChunkUnload(ChunkUnloadEvent e) {
-        ArtronCloud.clearChunk(e.getChunk());
+        ArtronCloud.removeInChunk(e.getChunk());
     }
 
 }

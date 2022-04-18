@@ -5,6 +5,7 @@ import fr.pandalunatique.tardisplugin.player.TardisPlayer;
 import fr.pandalunatique.tardisplugin.player.TardisPlayerRegistry;
 import fr.pandalunatique.tardisplugin.tardis.Tardis;
 import fr.pandalunatique.tardisplugin.tardis.TardisRegistry;
+import org.bukkit.craftbukkit.libs.org.apache.commons.codec.digest.DigestUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,28 +19,28 @@ public class ConnectionHandleListener implements Listener {
 
         Player p = e.getPlayer();
 
+        p.setResourcePack("https://www.dropbox.com/s/ypi72utybchjuf5/pack.zip?dl=1", DigestUtils.sha1("force"));
+
         TardisPlayer tardisPlayer;
         if(!Database.playerExists(p.getUniqueId())) {
 
             tardisPlayer = new TardisPlayer(p.getUniqueId());
             Database.addPlayer(tardisPlayer);
 
-            p.sendMessage("You don't exist so you've been created!"); //REMOVE
+            p.sendMessage("[DEBUG] Database@PlayerAdded: You've been registered in database!"); //REMOVE
 
         } else {
+
             tardisPlayer = Database.getPlayer(p.getUniqueId());
-            p.sendMessage("I know you buddy!"); //REMOVE
+            p.sendMessage("[DEBUG] Database@PlayerLoaded: You've been loaded from database!"); //REMOVE
 
             if(Database.hasTardis(tardisPlayer)) {
 
                 Tardis tardis = Database.getTardis(tardisPlayer);
+                tardisPlayer.setTardis(tardis);
                 TardisRegistry.getRegistry().registerTardis(tardis);
-                p.sendMessage("I see you're a man of culture");
+                p.sendMessage("[DEBUG] Database@TardisLoaded: Your tardis has been loaded from database!");
 
-            } else {
-                p.sendMessage("You don't have a tardis but now u doo!");
-                Tardis tardis = new Tardis(tardisPlayer);
-                Database.addTardis(tardis);
             }
 
         }
@@ -51,10 +52,16 @@ public class ConnectionHandleListener implements Listener {
     @EventHandler
     public void onPlayerLeaveEvent(PlayerQuitEvent e) {
 
+        TardisPlayer tp = TardisPlayerRegistry.getRegistry().getPlayer(e.getPlayer().getUniqueId());
+
+        Database.updatePlayer(tp);
+        if(tp.getTardis() != null) {
+            Database.updateTardis(tp.getTardis());
+        }
+
         TardisRegistry.getRegistry().unregisterTardis(e.getPlayer().getUniqueId());
         TardisPlayerRegistry.getRegistry().unregisterPlayer(e.getPlayer().getUniqueId());
 
     }
-
 
 }

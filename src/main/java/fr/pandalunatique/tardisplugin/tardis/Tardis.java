@@ -2,11 +2,13 @@ package fr.pandalunatique.tardisplugin.tardis;
 
 import com.google.gson.Gson;
 import fr.pandalunatique.tardisplugin.player.TardisPlayer;
+import fr.pandalunatique.tardisplugin.util.LocationLib;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -20,17 +22,11 @@ public class Tardis {
     @Getter private final Map<UUID, String> banlist;
 
     @Getter @Setter private Location tardisLocation;
-    @Getter @Setter private Location plotLocation;
     @Getter @Setter private TardisFacing facing;
+    @Getter @Setter private Location plotLocation;
 
-    @Getter @Setter private boolean isPublic;
-    @Getter @Setter private boolean isDoorOpen;
-    @Getter @Setter private boolean isLanded;
-    @Getter @Setter private boolean isFreeFlying;
-    @Getter @Setter private boolean isLanding;
     @Getter @Setter private boolean isChameleonCircuitEnabled;
-    @Getter @Setter private int landingFloor;
-    @Getter @Setter private short doorOpeningState; // 0 = fully closed / 90 = fully opened
+    @Getter @Setter private boolean isNew;
 
     @Getter @Setter private TardisAppearance appearance;
     @Getter @Setter private TardisChameleon chameleon;
@@ -39,6 +35,15 @@ public class Tardis {
     @Getter @Setter private int experience;
 
     private ObjectUtils.Null rooms;
+
+    // Non stored values (in database)
+    @Getter @Setter private boolean isPublic;
+    @Getter @Setter private boolean isDoorOpen;
+    @Getter @Setter private boolean isLanded;
+    @Getter @Setter private boolean isFreeFlying;
+    @Getter @Setter private boolean isLanding;
+    @Getter @Setter private int landingFloor;
+    @Getter @Setter private short doorOpeningState; // 0 = fully closed / 90 = fully opened
 
     public Tardis(UUID uuid) {
 
@@ -72,25 +77,25 @@ public class Tardis {
         this(p.getUuid());
     }
 
+    public static boolean canLandAt(Location location) {
+
+        boolean freeSpace = LocationLib.checkFreeSpace(location, 2, 2, 3); // Check for free space
+        boolean noNearbyTardis = TardisRegistry.getRegistry().getNearbyTardis(location, 2).size() == 0; // Check nearby tardis
+        //TODO: No jammer
+        //TODO: Not a protected area
+        //TODO: Block blacklist : water, lava, black
+
+        return freeSpace && noNearbyTardis;
+
+    }
+
     public void togglePublicState() { this.setPublic(!this.isPublic); }
+
     public void toggleDoor() { this.setDoorOpen(this.isDoorOpen); }
 
-
     public boolean landTardisAt(final Location loc) {
-        isLanded = false; isLanding = true;
-        final boolean previousDoorState = isDoorOpen; isDoorOpen = false;
-        //check if landing is possible
-        //true : ptite anim
-        //       tp tardis at loc
-        //       isLanding = false;
-        //       isLanded = true;
-        //       isDoorOpen = previousDoorState;
-        //       return true;
-        //false:
-        //       isLanding = false;
-        //       isLanded = true;
-        //       isDoorOpen = previousDoorState;
-        //       return false;
+
+
 
         return false;
     }
