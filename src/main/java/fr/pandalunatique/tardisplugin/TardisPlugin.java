@@ -80,10 +80,6 @@ public class TardisPlugin extends JavaPlugin {
 
         }
 
-        BooleanSet<TardisAppearance> a = BooleanSet.fromInteger(2, TardisAppearance.class);
-        Bukkit.broadcastMessage(a.print());
-
-
 
         // TEST
 

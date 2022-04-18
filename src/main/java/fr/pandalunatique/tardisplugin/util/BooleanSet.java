@@ -47,6 +47,7 @@ public class BooleanSet<T> {
 
     }
 
+    //FIXME: Find a better way to do this
     public int toInteger() {
 
         int value = 0;
@@ -65,12 +66,11 @@ public class BooleanSet<T> {
 
     }
 
+    //FIXME: Find a better way to do this
     public static <E> BooleanSet<E> fromInteger(int value, Class<E> clazz) {
 
-        BooleanSet<E> set = new BooleanSet<E>();
-        String binary = Integer.toBinaryString(value);
-
-        System.out.println(binary);
+        BooleanSet<E> set = new BooleanSet<>();
+        String binary = new StringBuilder(Integer.toBinaryString(value)).reverse().toString();
 
         for (int i = 0; i < binary.length(); i++) {
             if (binary.charAt(i) == '1') {

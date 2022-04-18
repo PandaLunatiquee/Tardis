@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -17,7 +18,7 @@ public class Tardis {
 
     @Getter private final UUID owner;
 
-    @Getter private final Map<UUID, TardisRole> roles;
+    @Getter private final Map<UUID, Integer> roles;
     @Getter private final Set<UUID> visitors;
     @Getter private final Map<UUID, String> banlist;
 
@@ -61,7 +62,7 @@ public class Tardis {
         this.experience = 0;
         this.doorOpeningState = 0;
         this.tardisLocation = new Location(Bukkit.getWorld("Tardis"), 0, 0, 0);
-        this.plotLocation = new Location(Bukkit.getWorlds().stream().filter((e) -> e.getName() != "Tardis").findFirst().get(), 0, 0, 0); //FIXME: Better ligne
+        this.plotLocation = new Location(Bukkit.getWorlds().stream().filter((e) -> e.getName().equals("Tardis")).findFirst().get(), 0, 0, 0); //FIXME: Better ligne
 
         this.roles = new HashMap<>();
         this.banlist = new HashMap<>();
