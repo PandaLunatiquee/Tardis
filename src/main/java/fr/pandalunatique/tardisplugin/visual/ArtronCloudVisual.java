@@ -3,10 +3,16 @@ package fr.pandalunatique.tardisplugin.visual;
 import fr.pandalunatique.tardisplugin.world.artron.ArtronCloud;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class ArtronCloudVisual {
 
@@ -16,16 +22,21 @@ public class ArtronCloudVisual {
     public static Runnable getVisualRunnable() {
         return () -> {
 
-            ArtronCloud.getArtronClouds().forEach((chunk, cloud) -> {
-                chunk.getWorld().spawnParticle(Particle.SMOKE_NORMAL, cloud.getLocation(), cloud.getCount() * 10, 0.5, 0.3, 0.5, 0.01, null, true);
-                chunk.getWorld().spawnParticle(Particle.CLOUD, cloud.getLocation(), cloud.getCount() * 8, 0.5, 0.3, 0.5, 0.01, null, true);
-                chunk.getWorld().spawnParticle(Particle.FLAME, cloud.getLocation(), cloud.getCount() * 6, 0.5, 0.3, 0.5, 0.01, null, true);
+            Iterator<Map.Entry<Chunk, ArtronCloud>> iterator = ArtronCloud.getArtronClouds().entrySet().iterator();
 
-                cloud.updateLifetime();
+            Bukkit.broadcastMessage(ArtronCloud.getArtronClouds().size() + " ArtronClouds!");
+
+            iterator.forEachRemaining(entry -> {
+
+                entry.getKey().getWorld().spawnParticle(Particle.SMOKE_NORMAL, entry.getValue().getLocation(), entry.getValue().getCount() * 10, 0.5, 0.3, 0.5, 0.01, null, true);
+                entry.getKey().getWorld().spawnParticle(Particle.CLOUD, entry.getValue().getLocation(), entry.getValue().getCount() * 8, 0.5, 0.3, 0.5, 0.01, null, true);
+                entry.getKey().getWorld().spawnParticle(Particle.FLAME, entry.getValue().getLocation(), entry.getValue().getCount() * 6, 0.5, 0.3, 0.5, 0.01, null, true);
+
+                entry.getValue().updateLifetime();
 
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    if (onlinePlayer.getLocation().getWorld().equals(cloud.getLocation().getWorld())) {
-                        if (onlinePlayer.getLocation().distance(cloud.getLocation()) < ArtronCloud.DANGER_REACH) {
+                    if (onlinePlayer.getLocation().getWorld().equals(entry.getValue().getLocation().getWorld())) {
+                        if (onlinePlayer.getLocation().distance(entry.getValue().getLocation()) < ArtronCloud.DANGER_REACH) {
 
                             onlinePlayer.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 200, 10, false, false));
                             onlinePlayer.damage(0.5);
@@ -35,6 +46,8 @@ public class ArtronCloudVisual {
                 }
 
             });
+
+            ArtronCloud.purge();
 
         };
 

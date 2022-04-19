@@ -63,12 +63,22 @@ public class ArtronCloud {
 
     }
 
+    public static void purge() {
+
+        Set<Chunk> deadClouds = new HashSet<>();
+        clouds.forEach((chunk, cloud) -> {
+            if(cloud.getLifetime() <= 0) {
+                deadClouds.add(chunk);
+            }
+        });
+
+        deadClouds.forEach(clouds::remove);
+
+    }
+
     public void updateLifetime() {
 
         this.lifetime -= 1;
-        if(this.lifetime == 0) {
-            removeArtronCloud(this);
-        }
 
     }
 

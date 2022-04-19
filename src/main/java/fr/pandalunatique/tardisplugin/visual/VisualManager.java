@@ -17,7 +17,7 @@ public class VisualManager {
         for(Visual v : Visual.values()) {
             BukkitTask task = v.startTask();
             if(task != null) {
-                visuals.add(v.startTask());
+                visuals.add(task);
             }
         }
 
