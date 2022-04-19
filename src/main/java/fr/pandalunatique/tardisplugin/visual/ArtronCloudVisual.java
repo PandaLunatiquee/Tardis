@@ -8,13 +8,11 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
-public class ArtronCloudVisual {
+public class ArtronCloudVisual implements VisualTask {
 
     public static int VISUAL_DELAY = 0;
     public static int VISUAL_REFRESH_RATE = ArtronCloud.VISUAL_REFRESH_RATE;
