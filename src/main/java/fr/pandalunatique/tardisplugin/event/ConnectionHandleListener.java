@@ -12,6 +12,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import javax.xml.crypto.Data;
+
 public class ConnectionHandleListener implements Listener {
 
     @EventHandler
@@ -21,23 +23,21 @@ public class ConnectionHandleListener implements Listener {
 
         p.setResourcePack("https://www.dropbox.com/s/ypi72utybchjuf5/pack.zip?dl=1", DigestUtils.sha1("force"));
 
-        TardisPlayer tardisPlayer;
-        if(!Database.playerExists(p.getUniqueId())) {
+        TardisPlayer tardisPlayer = Database.getPlayer(p.getUniqueId());
+        if(tardisPlayer == null) {
 
-            tardisPlayer = new TardisPlayer(p.getUniqueId());
+            tardisPlayer = new TardisPlayer(p);
             Database.addPlayer(tardisPlayer);
 
             p.sendMessage("[DEBUG] Database@PlayerAdded: You've been registered in database!"); //REMOVE
 
         } else {
 
-            tardisPlayer = Database.getPlayer(p.getUniqueId());
             p.sendMessage("[DEBUG] Database@PlayerLoaded: You've been loaded from database!"); //REMOVE
 
-            if(Database.hasTardis(tardisPlayer)) {
+            Tardis tardis = Database.getTardis(tardisPlayer);
+            if(tardis != null) {
 
-                Tardis tardis = Database.getTardis(tardisPlayer);
-                tardisPlayer.setTardis(tardis);
                 TardisRegistry.getRegistry().registerTardis(tardis);
                 p.sendMessage("[DEBUG] Database@TardisLoaded: Your tardis has been loaded from database!");
 

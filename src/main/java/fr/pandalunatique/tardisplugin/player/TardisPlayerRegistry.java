@@ -1,9 +1,11 @@
 package fr.pandalunatique.tardisplugin.player;
 
+import fr.pandalunatique.tardisplugin.Database;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -70,4 +72,13 @@ public class TardisPlayerRegistry {
         return this.getPlayer(uuid) != null;
     }
 
+    public void saveAll() {
+
+        Iterator<Map.Entry<UUID, TardisPlayer>> iterator = this.registry.entrySet().iterator();
+
+        iterator.forEachRemaining(entry -> {
+            Database.updatePlayer(entry.getValue());
+        });
+
+    }
 }

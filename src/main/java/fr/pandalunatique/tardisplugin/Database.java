@@ -6,10 +6,9 @@ import fr.pandalunatique.tardisplugin.tardis.Tardis;
 import fr.pandalunatique.tardisplugin.tardis.TardisAppearance;
 import fr.pandalunatique.tardisplugin.tardis.TardisChameleon;
 import fr.pandalunatique.tardisplugin.tardis.TardisFacing;
-import fr.pandalunatique.tardisplugin.util.BooleanStorable;
+import fr.pandalunatique.tardisplugin.util.BooleanStorableSet;
 import fr.pandalunatique.tardisplugin.util.LocationLib;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -30,7 +29,7 @@ import java.util.UUID;
  * @see TardisAppearance
  * @see TardisChameleon
  * @see TardisFacing
- * @see BooleanStorable
+ * @see BooleanStorableSet
  * @see LocationLib
  */
 public class Database {
@@ -118,7 +117,8 @@ public class Database {
                     "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "Uuid VARCHAR(36) UNIQUE NOT NULL, " +
                     "Level INT DEFAULT 0, " +
-                    "Experience INT DEFAULT 0" +
+                    "Experience INT DEFAULT 0," +
+                    "Bestiary VARCHAR(128) NOT NULL" +
             ");");
             stmt.execute("CREATE TABLE IF NOT EXISTS TardisPlotOffset (" +
                     "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -169,7 +169,7 @@ public class Database {
             ResultSet rs = stmt.executeQuery("SELECT * FROM Player LIMIT " + limit + " OFFSET " + offset + ";");
 
             while (rs.next()) {
-                set.add(new TardisPlayer(UUID.fromString(rs.getString("Uuid")), rs.getInt("Level"), rs.getInt("Experience")));
+                set.add(TardisPlayer.fromResultSet(rs));
             }
 
             con.close();
@@ -206,7 +206,7 @@ public class Database {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                tp = new TardisPlayer(UUID.fromString(rs.getString("Uuid")), rs.getInt("Level"), rs.getInt("Experience"));
+                tp = TardisPlayer.fromResultSet(rs);
             }
 
             con.close();
@@ -214,6 +214,7 @@ public class Database {
             stmt.close();
 
         } catch (SQLException e) {
+            e.printStackTrace();
             System.out.println(ChatColor.translateAlternateColorCodes('&', "&c[Tardis] Unable to recover player from database "));
             System.out.println(ChatColor.translateAlternateColorCodes('&', " &8» &7You can perform a report on the Tardis GitHub page including this file : //TODO//"));
             // TODO: Add stack trace to report file and identify the cause
@@ -265,19 +266,6 @@ public class Database {
     }
 
     /**
-     * Check if a TardisPlayer exists in the database.
-     *
-     * @see Database#getPlayer(UUID)
-     * @param uuid The UUID of the TardisPlayer
-     * @return True if the TardisPlayer exists, false otherwise
-     */
-    public static boolean playerExists(@NotNull UUID uuid) {
-
-        return Database.getPlayer(uuid) != null;
-
-    }
-
-    /**
      * Add a TardisPlayer to the database.
      *
      * @param tp The TardisPlayer to add
@@ -288,11 +276,9 @@ public class Database {
         try {
 
             Connection con = Database.getInstance().getConnection();
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO Player (Uuid, Level, Experience) VALUES (?, ?, ?)");
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO Player (Level, Experience, Bestiary, Uuid) VALUES (?, ?, ?, ?)");
 
-            stmt.setString(1, tp.getUuid().toString());
-            stmt.setInt(2, tp.getLevel());
-            stmt.setInt(3, tp.getExperience());
+            TardisPlayer.toPreparedStatement(tp, stmt);
             stmt.execute();
 
             con.close();
@@ -304,54 +290,10 @@ public class Database {
             System.out.println(ChatColor.translateAlternateColorCodes('&', "&c[Tardis] Unable to add player to database "));
             System.out.println(ChatColor.translateAlternateColorCodes('&', " &8» &7You can perform a report on the Tardis GitHub page including this file : //TODO//"));
             // TODO: Add stack trace to report file and identify the cause
+            e.printStackTrace();
         }
 
         return false;
-
-    }
-
-    /**
-     * Reset a TardisPlayer in the database.
-     *
-     * @param uuid The TardisPlayer to update
-     * @return True if the TardisPlayer was updated, false otherwise
-     */
-    public static boolean resetPlayer(@NotNull UUID uuid) {
-
-        try {
-
-            Connection con = Database.getInstance().getConnection();
-            PreparedStatement stmt = con.prepareStatement("UPDATE Player SET Level = ?, Experience = ? WHERE Uuid = ?;");
-            stmt.setInt(1, 0);
-            stmt.setInt(2, 0);
-            stmt.setString(3, uuid.toString());
-
-            stmt.execute();
-            con.close();
-            stmt.close();
-
-            return true;
-
-        } catch (SQLException e) {
-            System.out.println(ChatColor.translateAlternateColorCodes('&', "&c[Tardis] Unable to reset player from database "));
-            System.out.println(ChatColor.translateAlternateColorCodes('&', " &8» &7You can perform a report on the Tardis GitHub page including this file : //TODO//"));
-            // TODO: Add stack trace to report file and identify the cause
-        }
-
-        return false;
-
-    }
-
-    /**
-     * Reset a TardisPlayer in the database.
-     *
-     * @param tp The TardisPlayer to reset
-     * @see Database#resetPlayer(UUID)
-     * @return True if the TardisPlayer was reset, false otherwise
-     */
-    public static boolean resetPlayer(@NotNull TardisPlayer tp) {
-
-        return Database.resetPlayer(tp.getUuid());
 
     }
 
@@ -366,10 +308,8 @@ public class Database {
         try {
 
             Connection con = Database.getInstance().getConnection();
-            PreparedStatement stmt = con.prepareStatement("UPDATE Player SET Level=?, Experience=? WHERE Uuid=?;");
-            stmt.setInt(1, tp.getLevel());
-            stmt.setInt(2, tp.getExperience());
-            stmt.setString(2, tp.getUuid().toString());
+            PreparedStatement stmt = con.prepareStatement("UPDATE Player SET Level=?, Experience=?, Bestiary=? WHERE Uuid=?;");
+            TardisPlayer.toPreparedStatement(tp, stmt);
 
             stmt.execute();
             con.close();
@@ -502,31 +442,6 @@ public class Database {
     }
 
     /**
-     * Check if a Tardis exists in the database by its UUID.
-     *
-     * @param uuid The UUID of the Tardis to check
-     * @see Database#getTardis(UUID)
-     * @return True if the Tardis exists, false otherwise
-     */
-    public static boolean hasTardis(UUID uuid) {
-
-        return Database.getTardis(uuid) != null;
-
-    }
-
-    /**
-     * Check if a Tardis exists in the database by the TardisPlayer owner.
-     *
-     * @param tp The TardisPlayer owning the Tardis
-     * @see Database#getTardis(TardisPlayer)
-     * @see Database#hasTardis(UUID)
-     * @return True if the Tardis exists, false otherwise
-     */
-    public static boolean hasTardis(TardisPlayer tp) {
-        return Database.hasTardis(tp.getUuid());
-    }
-
-    /**
      * Remove a Tardis from the database by its UUID.
      *
      * @param uuid The UUID of the Tardis to remove
@@ -605,55 +520,6 @@ public class Database {
         }
 
         return false;
-
-    }
-
-    /**
-     * Reset a Tardis in the database
-     *
-     * @param uuid The UUID of the Tardis owner
-     * @return True if the Tardis was removed, false otherwise
-     */
-    public static boolean resetTardis(UUID uuid) {
-
-        try {
-
-            Connection con = Database.getInstance().getConnection();
-            PreparedStatement stmt = con.prepareStatement("UPDATE Tardis SET Level = ?, Experience = ?, Chameleon = ?, Appearance = ? WHERE Owner = ?;");
-            stmt.setInt(1, 0);
-            stmt.setInt(2, 0);
-            stmt.setInt(3, TardisChameleon.DEFAULT.getId());
-            stmt.setInt(4, TardisAppearance.DEFAULT.getBit());
-            stmt.setString(5, uuid.toString());
-
-            stmt.execute();
-
-            con.close();
-            stmt.close();
-
-            return false;
-
-        } catch(SQLException e) {
-            System.out.println(ChatColor.translateAlternateColorCodes('&', "&c[Tardis] Unable to reset tardis in database "));
-            System.out.println(ChatColor.translateAlternateColorCodes('&', " &8» &7You can perform a report on the Tardis GitHub page including this file : //TODO//"));
-            // TODO: Add stack trace to report file and identify the cause
-        }
-
-        return false;
-
-    }
-
-    /**
-     * Reset a Tardis in the database
-     *
-     * @param t The Tardis to reset
-     * @see Tardis
-     * @see Database#removeTardis(UUID)
-     * @return True if the Tardis was removed, false otherwise
-     */
-    public static boolean resetTardis(Tardis t) {
-
-        return Database.resetTardis(t.getOwner());
 
     }
 

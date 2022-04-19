@@ -59,10 +59,9 @@ public class InteractListener implements Listener {
 
                     } else {
 
-                        if(!Database.hasTardis(p.getUniqueId())) {
+                        if(Database.getTardis(p.getUniqueId()) == null) {
 
                             Tardis tardis = new Tardis(p);
-                            TardisPlayerRegistry.getRegistry().getPlayer(p.getUniqueId()).setTardis(tardis);
                             TardisRegistry.getRegistry().registerTardis(tardis);
 
                             Database.addTardis(tardis);

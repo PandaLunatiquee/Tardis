@@ -1,7 +1,5 @@
 package fr.pandalunatique.tardisplugin.tardis;
 
-import fr.pandalunatique.tardisplugin.util.BooleanStorable;
-
 // Aesthetic Skin List
 public enum TardisAppearance {
 

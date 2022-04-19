@@ -38,16 +38,25 @@ public class EntityEnum {
         ZOMBIE(25, EntityType.ZOMBIE),
         ZOMBIE_VILLAGER(26, EntityType.ZOMBIE_VILLAGER);
 
-        private int id;
+        private int bit;
         private EntityType type;
 
-        Aggressive(int id, EntityType type) {
-            this.id = id;
+        Aggressive(int bit, EntityType type) {
+            this.bit = bit;
             this.type = type;
         }
 
-        public int getId() {
-            return id;
+        public int getBit() {
+            return bit;
+        }
+
+        public static Aggressive fromBit(int bit) {
+            for (Aggressive a : values()) {
+                if (a.getBit() == bit) {
+                    return a;
+                }
+            }
+            return null;
         }
 
     }
@@ -70,7 +79,6 @@ public class EntityEnum {
         private int bit;
         private EntityType type;
 
-
         Neutral(int bit, EntityType type) {
             this.bit = bit;
             this.type = type;
@@ -78,6 +86,15 @@ public class EntityEnum {
 
         public int getBit() {
             return this.bit;
+        }
+
+        public static Neutral fromBit(int bit) {
+            for (Neutral n : Neutral.values()) {
+                if (n.getBit() == bit) {
+                    return n;
+                }
+            }
+            return null;
         }
 
     }
@@ -119,6 +136,15 @@ public class EntityEnum {
 
         public int getBit() {
             return this.bit;
+        }
+
+        public static Passive fromBit(int bit) {
+            for (Passive p : Passive.values()) {
+                if (p.getBit() == bit) {
+                    return p;
+                }
+            }
+            return null;
         }
 
     };

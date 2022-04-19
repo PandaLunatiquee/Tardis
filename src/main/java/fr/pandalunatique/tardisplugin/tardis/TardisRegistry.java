@@ -1,5 +1,6 @@
 package fr.pandalunatique.tardisplugin.tardis;
 
+import fr.pandalunatique.tardisplugin.Database;
 import fr.pandalunatique.tardisplugin.player.TardisPlayer;
 import fr.pandalunatique.tardisplugin.player.TardisPlayerRegistry;
 import org.bukkit.Location;
@@ -94,4 +95,13 @@ public class TardisRegistry {
         return this.getTardis(tardisPlayer.getUuid()) != null;
     }
 
+    public void saveAll() {
+
+        Iterator<Map.Entry<UUID, Tardis>> iterator = this.registry.entrySet().iterator();
+
+        iterator.forEachRemaining(entry -> {
+            Database.updateTardis(entry.getValue());
+        });
+
+    }
 }

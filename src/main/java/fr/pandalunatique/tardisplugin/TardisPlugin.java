@@ -1,19 +1,21 @@
 package fr.pandalunatique.tardisplugin;
 
+import fr.pandalunatique.tardisplugin.entity.EntityEnum;
 import fr.pandalunatique.tardisplugin.event.*;
 import fr.pandalunatique.tardisplugin.item.TardisItem;
+import fr.pandalunatique.tardisplugin.player.TardisPlayer;
+import fr.pandalunatique.tardisplugin.player.TardisPlayerRegistry;
+import fr.pandalunatique.tardisplugin.player.tool.bestiary.Bestiary;
 import fr.pandalunatique.tardisplugin.player.tool.forcefield.ForceField;
 import fr.pandalunatique.tardisplugin.item.TardisCraft;
 import fr.pandalunatique.tardisplugin.tardis.Tardis;
-import fr.pandalunatique.tardisplugin.tardis.TardisAppearance;
-import fr.pandalunatique.tardisplugin.util.BooleanSet;
+import fr.pandalunatique.tardisplugin.tardis.TardisRegistry;
+import fr.pandalunatique.tardisplugin.util.BooleanStorableSet;
 import fr.pandalunatique.tardisplugin.visual.VisualManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class TardisPlugin extends JavaPlugin {
 
@@ -74,14 +76,42 @@ public class TardisPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new TemporaryEvents(), this);
         Bukkit.getPluginManager().registerEvents(new ForceField(), this);
 
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
 
-            onlinePlayer.getInventory().addItem(TardisItem.TARDIS_KEY.getItemStack());
+        Bukkit.getOnlinePlayers().forEach(player -> {
 
-        }
+            TardisPlayer tardisPlayer = Database.getPlayer(player.getUniqueId());
+
+            if(tardisPlayer != null) {
+
+                Tardis tardis = Database.getTardis(player.getUniqueId());
+
+                if(tardis != null) TardisRegistry.getRegistry().registerTardis(tardis);
+                TardisPlayerRegistry.getRegistry().registerPlayer(tardisPlayer);
+
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a&lProgression! &aYour progression has been loaded successfully!"));
+                player.sendMessage(String.valueOf(tardisPlayer.getBestiary().getAggressive()));
+
+            } else {
+                player.kickPlayer(ChatColor.RED + "We couldn't retrieve your data! Please try to reconnect!");
+            }
+        });
+
+    }
 
 
-        // TEST
+    @Override
+    public void onDisable() {
+
+        TardisPlayerRegistry.getRegistry().saveAll();
+        TardisRegistry.getRegistry().saveAll();
+
+        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&a&lProgression! &aYour progression has been saved!"));
+
+    }
+
+}
+
+// TEST
 
 //        Player p = Bukkit.getPlayer("PandaLunatique");
 //        Location l = p.getLocation();
@@ -107,16 +137,3 @@ public class TardisPlugin extends JavaPlugin {
 //            aaa.playerConnection.sendPacket(paa);
 //
 //        }, 0, 1);
-
-
-    }
-
-
-    @Override
-    public void onDisable() {
-
-
-
-    }
-
-}

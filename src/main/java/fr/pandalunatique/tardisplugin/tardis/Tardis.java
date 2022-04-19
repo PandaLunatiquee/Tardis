@@ -2,6 +2,7 @@ package fr.pandalunatique.tardisplugin.tardis;
 
 import com.google.gson.Gson;
 import fr.pandalunatique.tardisplugin.player.TardisPlayer;
+import fr.pandalunatique.tardisplugin.util.BooleanStorableSet;
 import fr.pandalunatique.tardisplugin.util.LocationLib;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class Tardis {
 
     @Getter private final UUID owner;
 
-    @Getter private final Map<UUID, Integer> roles;
+    @Getter private final Map<UUID, BooleanStorableSet<RolePermission>> roles;
     @Getter private final Set<UUID> visitors;
     @Getter private final Map<UUID, String> banlist;
 
