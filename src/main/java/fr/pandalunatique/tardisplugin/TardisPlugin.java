@@ -76,7 +76,7 @@ public class TardisPlugin extends JavaPlugin {
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
 
-            onlinePlayer.getInventory().addItem(TardisItem.TARDIS_KEY.getItemStack(onlinePlayer.getUniqueId()));
+            onlinePlayer.getInventory().addItem(TardisItem.TARDIS_KEY.getItemStack());
 
         }
 

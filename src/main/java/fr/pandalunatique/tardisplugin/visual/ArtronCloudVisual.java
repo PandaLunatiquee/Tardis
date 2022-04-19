@@ -24,8 +24,6 @@ public class ArtronCloudVisual {
 
             Iterator<Map.Entry<Chunk, ArtronCloud>> iterator = ArtronCloud.getArtronClouds().entrySet().iterator();
 
-            Bukkit.broadcastMessage(ArtronCloud.getArtronClouds().size() + " ArtronClouds!");
-
             iterator.forEachRemaining(entry -> {
 
                 entry.getKey().getWorld().spawnParticle(Particle.SMOKE_NORMAL, entry.getValue().getLocation(), entry.getValue().getCount() * 10, 0.5, 0.3, 0.5, 0.01, null, true);
