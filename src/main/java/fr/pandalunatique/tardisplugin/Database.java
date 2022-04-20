@@ -8,6 +8,7 @@ import fr.pandalunatique.tardisplugin.tardis.TardisChameleon;
 import fr.pandalunatique.tardisplugin.tardis.TardisFacing;
 import fr.pandalunatique.tardisplugin.util.BooleanStorableSet;
 import fr.pandalunatique.tardisplugin.util.LocationLib;
+import fr.pandalunatique.tardisplugin.world.TardisGenerator;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +38,7 @@ public class Database {
     private static Database instance;
 
     private final String path;
+    private final String sqlpath;
 
     /**
      * Database constructor.
@@ -46,7 +48,8 @@ public class Database {
      */
     private Database() {
 
-        this.path = "jdbc:sqlite:plugins/Tardis/tardis.db";
+        this.path = "plugins/Tardis/tardis.db";
+        this.sqlpath = "jdbc:sqlite:" + this.path;
         this.initialize();
 
     }
@@ -84,7 +87,7 @@ public class Database {
      * @throws SQLException if the connection failed
      */
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(this.path);
+        return DriverManager.getConnection(this.sqlpath);
     }
 
     /**
@@ -130,7 +133,7 @@ public class Database {
             ");");
 
             // Insert default values
-            stmt.execute("INSERT INTO TardisPlotOffset (CurrentX, CurrentZ) VALUES (-25000000, -25000000)");
+            stmt.execute("INSERT INTO TardisPlotOffset (CurrentX, CurrentZ) VALUES (" + TardisGenerator.Offset.LEAST_X +", " + TardisGenerator.Offset.LEAST_Z + ")");
 
 
         } catch (SQLException e) {
@@ -140,6 +143,58 @@ public class Database {
 
     }
 
+    @Nullable
+    public static TardisGenerator.Offset getPlotOffset() {
+
+        TardisGenerator.Offset offset = null;
+
+        try {
+
+            Connection con = Database.getInstance().getConnection();
+            Statement stmt = con.createStatement();
+
+            ResultSet rs = stmt.executeQuery("SELECT * FROM TardisPlotOffset WHERE Id = 1");
+
+            if (rs.next()) {
+                offset = new TardisGenerator.Offset(rs.getInt("CurrentX"), rs.getInt("CurrentZ"));
+            }
+
+            con.close();
+            stmt.close();
+            rs.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(ChatColor.translateAlternateColorCodes('&', "&c[Tardis] Unable to recover plot offset "));
+            System.out.println(ChatColor.translateAlternateColorCodes('&', " &8» &7You can perform a report on the Tardis GitHub page including this file : //TODO//"));
+            // TODO: Add stack trace to report file and identify the cause
+        }
+
+        return offset;
+
+    }
+
+    public static void setPlotOffset(TardisGenerator.Offset offset) {
+
+        try {
+
+            Connection con = Database.getInstance().getConnection();
+            PreparedStatement stmt = con.prepareStatement("UPDATE TardisPlotOffset SET CurrentX = ?, CurrentZ = ? WHERE Id = 1");
+            stmt.setInt(1, offset.getX());
+            stmt.setInt(2, offset.getZ());
+            stmt.execute();
+
+            con.close();
+            stmt.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(ChatColor.translateAlternateColorCodes('&', "&c[Tardis] Unable to update plot offset "));
+            System.out.println(ChatColor.translateAlternateColorCodes('&', " &8» &7You can perform a report on the Tardis GitHub page including this file : //TODO//"));
+            // TODO: Add stack trace to report file and identify the cause
+        }
+
+    }
 
     /**
      * Get a set of the 20 first rows of the TardisPlayer table.

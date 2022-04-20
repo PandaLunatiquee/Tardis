@@ -3,6 +3,11 @@ description: "Tardis"
 version: "1.0.0"
 main: fr.pandalunatique.tardisplugin.TardisPlugin
 api-version: 1.16
+softdepend:
+  - FastAsyncWorldEdit
+depend:
+  - FastAsyncWorldEdit
+
 commands:
   tgive:
     description: "Temporary give command"

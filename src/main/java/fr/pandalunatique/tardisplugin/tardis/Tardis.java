@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import fr.pandalunatique.tardisplugin.player.TardisPlayer;
 import fr.pandalunatique.tardisplugin.util.BooleanStorableSet;
 import fr.pandalunatique.tardisplugin.util.LocationLib;
+import fr.pandalunatique.tardisplugin.world.TardisGenerator;
+import fr.pandalunatique.tardisplugin.world.TardisWorldManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.ObjectUtils;
@@ -92,12 +94,13 @@ public class Tardis {
         this.appearance = TardisAppearance.DEFAULT;
         this.chameleon = TardisChameleon.DEFAULT;
         this.facing = TardisFacing.EAST;
-        this.level = 0; // Level 0 before tardis crafting
+        this.level = 0;
         this.experience = 0;
         this.doorOpeningState = 0;
         this.tardisLocation = new Location(Bukkit.getWorld("Tardis"), 0, 0, 0);
         this.plotLocation = new Location(Bukkit.getWorlds().stream().filter((e) -> e.getName().equals("Tardis")).findFirst().get(), 0, 0, 0); //FIXME: Better line
-
+        this.isNew = true;
+        this.rooms = null;
         this.roles = new HashMap<>();
         this.banlist = new Banlist();
         this.visitors = new HashSet<>();
@@ -167,6 +170,11 @@ public class Tardis {
 
 
         return false;
+    }
+
+    public void generatePlot() {
+        Location plotLocation = TardisGenerator.getInstance().generateNewPlot();
+        this.setPlotLocation(plotLocation);
     }
 
 //    public void resetTardisSkin() { tardisSkin = TardisAppearance.DEFAULT; }

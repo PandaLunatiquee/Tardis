@@ -5,6 +5,8 @@ import fr.pandalunatique.tardisplugin.item.TardisItem;
 import fr.pandalunatique.tardisplugin.player.TardisPlayerRegistry;
 import fr.pandalunatique.tardisplugin.tardis.Tardis;
 import fr.pandalunatique.tardisplugin.tardis.TardisRegistry;
+import fr.pandalunatique.tardisplugin.world.TardisGenerator;
+import fr.pandalunatique.tardisplugin.world.TardisWorldManager;
 import fr.pandalunatique.tardisplugin.world.artron.ArtronCloud;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,6 +18,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.UUID;
 
 public class InteractListener implements Listener {
 
@@ -53,13 +57,30 @@ public class InteractListener implements Listener {
 
                 } else if(TardisItem.TARDIS_KEY.isSimilarTo(item)) {
 
+                    UUID uuid = TardisItem.getSoulbinding(item);
+
                     if(TardisItem.getSoulbinding(item) != null) {
 
-                        // call tardis
+                        if(!p.getUniqueId().equals(TardisItem.getSoulbinding(item))) {
+                            p.sendMessage(ChatColor.RED + "This is not your key!");
+                            return;
+                        }
+
+                        Tardis tardis = TardisRegistry.getRegistry().getTardis(p.getUniqueId());
+
+                        if(tardis != null) {
+
+                            p.sendMessage(TardisGenerator.getInstance().getCurrentLocation().toString());
+                            //tardis.generatePlot();
+                            tardis.setTardisLocation(p.getLocation());
+
+                        } else {
+                            p.sendMessage(ChatColor.RED + "You don't have any tardis!");
+                        }
 
                     } else {
 
-                        if(Database.getTardis(p.getUniqueId()) == null) {
+                        if(TardisRegistry.getRegistry().getTardis(p.getUniqueId()) == null && Database.getTardis(p.getUniqueId()) == null) {
 
                             Tardis tardis = new Tardis(p);
                             TardisRegistry.getRegistry().registerTardis(tardis);
@@ -67,7 +88,7 @@ public class InteractListener implements Listener {
                             Database.addTardis(tardis);
 
                             p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e&lCongrats! &eYou now have a Tardis!"));
-                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&8» &7Right click on a block with your key to summon your tardis!"));
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&8» &7Right click on a block with your key to summon your tardis for the first time!"));
 
                             TardisItem.setSoulbinding(item, p.getUniqueId());
 

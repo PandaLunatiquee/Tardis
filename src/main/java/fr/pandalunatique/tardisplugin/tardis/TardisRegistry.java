@@ -43,6 +43,18 @@ public class TardisRegistry {
 
     }
 
+    public Set<Tardis> getRegistered() {
+
+        Set<Tardis> set = new HashSet<>();
+
+        this.registry.forEach((__, value) -> {
+            set.add(value);
+        });
+
+        return set;
+
+    }
+
     public void registerTardis(Tardis tardis) {
 
         if(this.registry.containsKey(tardis.getOwner())) {

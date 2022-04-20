@@ -8,16 +8,25 @@ import fr.pandalunatique.tardisplugin.player.TardisPlayerRegistry;
 import fr.pandalunatique.tardisplugin.player.tool.bestiary.Bestiary;
 import fr.pandalunatique.tardisplugin.player.tool.forcefield.ForceField;
 import fr.pandalunatique.tardisplugin.item.TardisCraft;
+import fr.pandalunatique.tardisplugin.schematic.SchematicManager;
 import fr.pandalunatique.tardisplugin.tardis.Banlist;
 import fr.pandalunatique.tardisplugin.tardis.Tardis;
+import fr.pandalunatique.tardisplugin.tardis.TardisFacing;
 import fr.pandalunatique.tardisplugin.tardis.TardisRegistry;
 import fr.pandalunatique.tardisplugin.util.BooleanStorableSet;
 import fr.pandalunatique.tardisplugin.visual.VisualManager;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import fr.pandalunatique.tardisplugin.world.TardisWorldGenerator;
+import fr.pandalunatique.tardisplugin.world.TardisWorldManager;
+import net.md_5.bungee.api.ChatMessageType;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.util.Locale;
 import java.util.UUID;
 
 public class TardisPlugin extends JavaPlugin {
@@ -36,11 +45,6 @@ public class TardisPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
 
-        Banlist b = new Banlist();
-        b.ban(UUID.randomUUID(), "Because");
-
-        System.out.println(Banlist.deserialize(b.serialize()).getBanned());
-
         instance = this;
         nmsVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 
@@ -55,10 +59,18 @@ public class TardisPlugin extends JavaPlugin {
         System.out.println();
 
         // Create plugin folder
-        if(!getDataFolder().exists()) getDataFolder().mkdir(); //TODO: Handle exception
+        if(!this.getDataFolder().exists()) {
+            this.getDataFolder().mkdir(); //TODO: Handle exception
+
+            File schematicFolder = new File(this.getDataFolder(), "schematic");
+            if(!schematicFolder.exists()) schematicFolder.mkdir();
+
+        }
+
+        SchematicManager.saveSchematics();
 
         // Connect to database and check if connection if valid, otherwise disable the plugin
-        if(!Database.getInstance().canConnect()) Bukkit.getPluginManager().disablePlugin(this);
+        if(!Database.canConnect()) Bukkit.getPluginManager().disablePlugin(this);
 
         // Registering main events
         Bukkit.getPluginManager().registerEvents(new ConnectionHandleListener(), this);
@@ -70,15 +82,12 @@ public class TardisPlugin extends JavaPlugin {
         this.getCommand("tgive").setExecutor(new TemporaryGiveCommand());
 
         // Registering custom items and recipes
-        for(TardisCraft craft : TardisCraft.values()) {
-
-            craft.registerRecipe();
-
-        }
+        TardisCraft.registerRecipes();
 
         // Starting visuals
         VisualManager.startAll();
 
+        TardisWorldManager.loadWorlds();
 
         // TEMPORARY EVENT REGISTERING
         Bukkit.getPluginManager().registerEvents(new TemporaryEvents(), this);
@@ -88,6 +97,9 @@ public class TardisPlugin extends JavaPlugin {
 
             TardisPlayer tardisPlayer = Database.getPlayer(player.getUniqueId());
 
+            ItemStack i = TardisItem.TARDIS_KEY.getItemStack();
+            TardisItem.setSoulbinding(i, player.getUniqueId());
+            player.getInventory().addItem(i);
             if(tardisPlayer != null) {
 
                 Tardis tardis = Database.getTardis(player.getUniqueId());
@@ -101,7 +113,51 @@ public class TardisPlugin extends JavaPlugin {
             } else {
                 player.kickPlayer(ChatColor.RED + "We couldn't retrieve your data! Please try to reconnect!");
             }
+
         });
+
+
+
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+
+            for (Tardis tardis : TardisRegistry.getRegistry().getRegistered()) {
+
+                Bukkit.getOnlinePlayers().forEach(player -> {
+
+                    Location ploc = player.getLocation();
+
+                    if(ploc.distance(tardis.getTardisLocation()) < 10) {
+
+                        BlockFace face = BlockFace.valueOf(tardis.getFacing().name());
+                        Location relative = tardis.getTardisLocation().getBlock().getRelative(face).getLocation();
+                        Location relative2 = tardis.getTardisLocation().getBlock().getRelative(face, 2).getLocation();
+
+                       // player.sendMessage("" + (int) ploc.getX() + " " + tardis.getTardisLocation().getX());
+
+                        boolean x = (int) ploc.getX() == (int) relative.getX() || (int) ploc.getX() == (int) tardis.getTardisLocation().getX();
+                        boolean y = (int) ploc.getY() == (int) tardis.getTardisLocation().getY();
+                        boolean z = (int) ploc.getZ() == (int) relative.getZ() || (int) ploc.getZ() == (int) tardis.getTardisLocation().getZ();
+
+                        x = x || (int) ploc.getX() == (int) relative2.getX();
+                        z = z || (int) ploc.getZ() == (int) relative2.getZ();
+
+                        if(x && y && z) {
+
+                            player.sendBlockChange(tardis.getTardisLocation(), Material.AIR.createBlockData());
+                            player.sendBlockChange(tardis.getTardisLocation().getBlock().getRelative(BlockFace.UP).getLocation(), Material.AIR.createBlockData());
+
+                        } else {
+                            player.sendBlockChange(tardis.getTardisLocation(), Material.REDSTONE_BLOCK.createBlockData());
+                            player.sendBlockChange(tardis.getTardisLocation().getBlock().getRelative(BlockFace.UP).getLocation(), Material.REDSTONE_BLOCK.createBlockData());
+                        }
+
+                    }
+
+                });
+
+            }
+
+        } , 0, 5);
 
     }
 

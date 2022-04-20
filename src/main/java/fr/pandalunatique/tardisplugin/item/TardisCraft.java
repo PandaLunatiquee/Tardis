@@ -109,4 +109,14 @@ public enum TardisCraft {
 
     }
 
+    public static void registerRecipes() {
+
+        for(TardisCraft craft : TardisCraft.values()) {
+
+            craft.registerRecipe();
+
+        }
+
+    }
+
 }

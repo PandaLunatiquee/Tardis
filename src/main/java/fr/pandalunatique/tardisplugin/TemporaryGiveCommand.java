@@ -1,20 +1,26 @@
 package fr.pandalunatique.tardisplugin;
 
+import com.fastasyncworldedit.core.FaweAPI;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.World;
 import fr.pandalunatique.tardisplugin.item.TardisItem;
-import fr.pandalunatique.tardisplugin.tardis.Tardis;
+import fr.pandalunatique.tardisplugin.schematic.SchematicManager;
+import fr.pandalunatique.tardisplugin.tardis.TardisFacing;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.io.IOException;
 
 public class TemporaryGiveCommand implements CommandExecutor {
 
