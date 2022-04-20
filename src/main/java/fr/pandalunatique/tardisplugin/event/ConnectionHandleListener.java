@@ -38,6 +38,8 @@ public class ConnectionHandleListener implements Listener {
             Tardis tardis = Database.getTardis(tardisPlayer);
             if(tardis != null) {
 
+                tardis.dump();
+
                 TardisRegistry.getRegistry().registerTardis(tardis);
                 p.sendMessage("[DEBUG] Database@TardisLoaded: Your tardis has been loaded from database!");
 

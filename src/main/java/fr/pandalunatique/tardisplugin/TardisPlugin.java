@@ -8,6 +8,7 @@ import fr.pandalunatique.tardisplugin.player.TardisPlayerRegistry;
 import fr.pandalunatique.tardisplugin.player.tool.bestiary.Bestiary;
 import fr.pandalunatique.tardisplugin.player.tool.forcefield.ForceField;
 import fr.pandalunatique.tardisplugin.item.TardisCraft;
+import fr.pandalunatique.tardisplugin.tardis.Banlist;
 import fr.pandalunatique.tardisplugin.tardis.Tardis;
 import fr.pandalunatique.tardisplugin.tardis.TardisRegistry;
 import fr.pandalunatique.tardisplugin.util.BooleanStorableSet;
@@ -16,6 +17,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.UUID;
 
 public class TardisPlugin extends JavaPlugin {
 
@@ -32,6 +35,11 @@ public class TardisPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
+        Banlist b = new Banlist();
+        b.ban(UUID.randomUUID(), "Because");
+
+        System.out.println(Banlist.deserialize(b.serialize()).getBanned());
 
         instance = this;
         nmsVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
@@ -75,7 +83,6 @@ public class TardisPlugin extends JavaPlugin {
         // TEMPORARY EVENT REGISTERING
         Bukkit.getPluginManager().registerEvents(new TemporaryEvents(), this);
         Bukkit.getPluginManager().registerEvents(new ForceField(), this);
-
 
         Bukkit.getOnlinePlayers().forEach(player -> {
 

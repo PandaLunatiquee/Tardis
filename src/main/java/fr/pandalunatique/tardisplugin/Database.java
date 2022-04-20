@@ -111,7 +111,10 @@ public class Database {
                     "TardisPlotLocation VARCHAR(128) DEFAULT 0," +
                     "Facing TINYINT DEFAULT 0," +
                     "Chameleon TINYINT DEFAULT 0," +
-                    "Appearance TINYINT DEFAULT 0" +
+                    "ChameleonEnabled BIT DEFAULT 0," +
+                    "Appearance TINYINT DEFAULT 0," +
+                    "Banlist TEXT DEFAULT '{}'," +
+                    "IsNew BIT DEFAULT 1" +
             ");");
             stmt.execute("CREATE TABLE IF NOT EXISTS Player (" +
                     "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -132,6 +135,7 @@ public class Database {
 
         } catch (SQLException e) {
             System.out.println(ChatColor.RED + "[Tardis] Unable to initialise database!");
+            e.printStackTrace();
         }
 
     }
@@ -361,13 +365,7 @@ public class Database {
 
             while(rs.next()) {
 
-                Tardis t = new Tardis(UUID.fromString(rs.getString("Owner")));
-                t.setPlotLocation(LocationLib.jsonToLocation(rs.getString("TardisPlotLocation")));
-                t.setTardisLocation(LocationLib.jsonToLocation(rs.getString("TardisLocation")));
-                t.setFacing(TardisFacing.valueOf(rs.getInt("Facing")));
-                t.setAppearance(TardisAppearance.fromBit(rs.getInt("Appearance")));
-
-                set.add(t);
+                set.add(Tardis.fromResultSet(rs));
 
             }
             con.close();
@@ -378,6 +376,7 @@ public class Database {
             System.out.println(ChatColor.translateAlternateColorCodes('&', "&c[Tardis] Unable to get tardis from database "));
             System.out.println(ChatColor.translateAlternateColorCodes('&', " &8» &7You can perform a report on the Tardis GitHub page including this file : //TODO//"));
             // TODO: Add stack trace to report file and identify the cause
+            e.printStackTrace();
         }
 
         return set;
@@ -406,11 +405,7 @@ public class Database {
 
             if(rs.next()) {
 
-                t = new Tardis(uuid);
-                t.setPlotLocation(LocationLib.jsonToLocation(rs.getString("TardisPlotLocation")));
-                t.setTardisLocation(LocationLib.jsonToLocation(rs.getString("TardisLocation")));
-                t.setFacing(TardisFacing.valueOf(rs.getInt("Facing")));
-                t.setAppearance(TardisAppearance.fromBit(rs.getInt("Appearance")));
+                t = Tardis.fromResultSet(rs);
             }
 
             con.close();
@@ -421,6 +416,7 @@ public class Database {
             System.out.println(ChatColor.translateAlternateColorCodes('&', "&c[Tardis] Unable to get the tardis from database "));
             System.out.println(ChatColor.translateAlternateColorCodes('&', " &8» &7You can perform a report on the Tardis GitHub page including this file : //TODO//"));
             // TODO: Add stack trace to report file and identify the cause
+            e.printStackTrace();
         }
 
         return t;
@@ -496,15 +492,9 @@ public class Database {
         try {
 
             Connection con = Database.getInstance().getConnection();
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO Tardis (Owner, Level, Experience, TardisLocation, TardisPlotLocation, Facing, Chameleon, Appearance) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
-            stmt.setString(1, t.getOwner().toString());
-            stmt.setInt(2, t.getLevel());
-            stmt.setInt(3, t.getExperience());
-            stmt.setString(4, LocationLib.locationToJson(t.getTardisLocation()));
-            stmt.setString(5, LocationLib.locationToJson(t.getPlotLocation()));
-            stmt.setInt(6, t.getFacing().getBit());
-            stmt.setInt(7, t.getChameleon().getId());
-            stmt.setInt(8, t.getAppearance().getBit());
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO Tardis (Level, Experience, TardisLocation, TardisPlotLocation, Facing, Chameleon, ChameleonEnabled, Appearance, Banlist, IsNew, Owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+
+            Tardis.toPreparedStatement(t, stmt);
 
             stmt.execute();
 
@@ -517,6 +507,7 @@ public class Database {
             System.out.println(ChatColor.translateAlternateColorCodes('&', "&c[Tardis] Unable to add tardis to database "));
             System.out.println(ChatColor.translateAlternateColorCodes('&', " &8» &7You can perform a report on the Tardis GitHub page including this file : //TODO//"));
             // TODO: Add stack trace to report file and identify the cause
+            e.printStackTrace();
         }
 
         return false;
@@ -535,15 +526,9 @@ public class Database {
         try {
 
             Connection con = Database.getInstance().getConnection();
-            PreparedStatement stmt = con.prepareStatement("UPDATE Tardis SET Level = ?, Experience = ?, TardisLocation = ?, TardisPlotLocation = ?, Facing = ?, Chameleon = ?, Appearance = ? WHERE Owner = ?");
-            stmt.setInt(1, t.getLevel());
-            stmt.setInt(2, t.getExperience());
-            stmt.setString(3, LocationLib.locationToJson(t.getTardisLocation()));
-            stmt.setString(4, LocationLib.locationToJson(t.getPlotLocation()));
-            stmt.setInt(5, t.getFacing().getBit());
-            stmt.setInt(6, t.getChameleon().getId());
-            stmt.setInt(7, t.getAppearance().getBit());
-            stmt.setString(8, t.getOwner().toString());
+            PreparedStatement stmt = con.prepareStatement("UPDATE Tardis SET Level = ?, Experience = ?, TardisLocation = ?, TardisPlotLocation = ?, Facing = ?, Chameleon = ?, ChameleonEnabled = ?, Appearance = ?, Banlist = ?, IsNew = ? WHERE Owner = ?");
+
+            Tardis.toPreparedStatement(t, stmt);
 
             stmt.execute();
             con.close();
@@ -555,6 +540,7 @@ public class Database {
             System.out.println(ChatColor.translateAlternateColorCodes('&', "&c[Tardis] Unable to update tardis in database "));
             System.out.println(ChatColor.translateAlternateColorCodes('&', " &8» &7You can perform a report on the Tardis GitHub page including this file : //TODO//"));
             // TODO: Add stack trace to report file and identify the cause
+            e.printStackTrace();
         }
 
         return false;

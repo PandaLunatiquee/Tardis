@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -62,11 +63,11 @@ public class BooleanStorableSet<T> {
 
         try {
 
-            Method getBit = this.set.iterator().next().getClass().getMethod("getBit");
+            Method ordinal = this.set.iterator().next().getClass().getMethod("ordinal");
 
             for(T element : this.set) {
 
-                int bit = (int) getBit.invoke(element);
+                int bit = (int) ordinal.invoke(element);
                 result += Math.pow(2, bit);
 
             }
@@ -101,7 +102,8 @@ public class BooleanStorableSet<T> {
 
             Set<V> set = new HashSet<>();
 
-            Method fromBit = clazz.getMethod("fromBit", int.class);
+            Method values = clazz.getMethod("values");
+            V[] enumValues = (V[]) values.invoke(null);
 
             int currentBit = BooleanStorableSet.maxBit(integer) - 1;
             int currentValue = integer;
@@ -110,7 +112,7 @@ public class BooleanStorableSet<T> {
 
                 if(currentValue % 2 == 1) {
 
-                    V element = (V) fromBit.invoke(null, currentBit);
+                    V element = enumValues[currentBit];
                     set.add(element);
 
                 }
