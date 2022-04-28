@@ -1,19 +1,24 @@
 package fr.pandalunatique.tardisplugin.tardis;
 
-import com.google.gson.Gson;
 import fr.pandalunatique.tardisplugin.player.TardisPlayer;
 import fr.pandalunatique.tardisplugin.util.BooleanStorableSet;
+import fr.pandalunatique.tardisplugin.util.ChanceLib;
 import fr.pandalunatique.tardisplugin.util.LocationLib;
 import fr.pandalunatique.tardisplugin.world.TardisGenerator;
-import fr.pandalunatique.tardisplugin.world.TardisWorldManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -48,9 +53,14 @@ public class Tardis {
     @Getter @Setter private boolean isDoorOpen;
     @Getter @Setter private boolean isLanded;
     @Getter @Setter private boolean isFreeFlying;
-    @Getter @Setter private boolean isLanding;
+    @Getter @Setter private boolean isPhasing;
+    @Getter @Setter private int phasingState;
     @Getter @Setter private int landingFloor;
     @Getter @Setter private short doorOpeningState; // 0 = fully closed / 90 = fully opened
+
+    @Getter @Setter private Entity entityTardis;
+    @Getter @Setter private Entity entityLeftDoor;
+    @Getter @Setter private Entity entityRightDoor;
 
     //DEBUG: This is a debug method, it will be removed in the future
     public void dump() {
@@ -75,7 +85,7 @@ public class Tardis {
         System.out.println("Is door open: " + this.isDoorOpen);
         System.out.println("Is landed: " + this.isLanded);
         System.out.println("Is free flying: " + this.isFreeFlying);
-        System.out.println("Is landing: " + this.isLanding);
+        System.out.println("Is landing: " + this.isPhasing);
         System.out.println("Landing floor: " + this.getLandingFloor());
         System.out.println("Door opening state: " + this.getDoorOpeningState());
 
@@ -87,8 +97,9 @@ public class Tardis {
         this.owner = uuid;
         this.isPublic = false;
         this.isDoorOpen = false;
-        this.isLanded = true;
-        this.isLanding = false;
+        this.isLanded = false;
+        this.isPhasing = false;
+        this.phasingState = 0;
         this.isFreeFlying = false;
         this.isChameleonCircuitEnabled = false;
         this.appearance = TardisAppearance.DEFAULT;
@@ -161,20 +172,94 @@ public class Tardis {
 
     }
 
-    public void togglePublicState() { this.setPublic(!this.isPublic); }
 
-    public void toggleDoor() { this.setDoorOpen(this.isDoorOpen); }
+    public void landTardisAt(Location loc) {
 
-    public boolean landTardisAt(final Location loc) {
+        this.setTardisLocation(loc);
+
+        float angle = this.getFacing().getBaseAngle();
+
+        Location tardisLoc = loc.clone().add(0.5, 0, 0.5);
+        tardisLoc.setYaw(angle);
+
+        if(this.isLanded()) {
+
+            Block upperBlock = this.getTardisLocation().getBlock().getRelative(BlockFace.UP, 2);
+            if(upperBlock.getType().equals(Material.BARRIER)) upperBlock.setType(Material.AIR);
+
+            if(this.entityTardis != null && this.entityTardis.isValid()) this.entityTardis.remove();
+            if(this.entityLeftDoor != null && this.entityLeftDoor.isValid()) this.entityLeftDoor.remove();
+            if(this.entityRightDoor != null && this.entityRightDoor.isValid()) this.entityRightDoor.remove();
+
+            Bukkit.getOnlinePlayers().forEach(p -> {
+                p.sendBlockChange(this.getTardisLocation(), this.getTardisLocation().getBlock().getType().createBlockData());
+
+            });
 
 
+        }
 
-        return false;
+        // PHASE
+
+        double thetaLeft = Math.toRadians((360 - angle) + 40);
+        double thetaRight = Math.toRadians((360 - angle) - 40);
+        double xl = Math.sin(thetaLeft) * 17/20;
+        double zl = Math.cos(thetaLeft) * 17/20;
+        double xr = Math.sin(thetaRight) * 17/20;
+        double zr = Math.cos(thetaRight) * 17/20;
+
+        System.out.println(""+xl + " " + zl + " " + xr + " " + zr);
+
+        this.entityTardis = tardisLoc.getWorld().spawnEntity(tardisLoc, EntityType.ARMOR_STAND);
+        this.entityLeftDoor = tardisLoc.getWorld().spawnEntity(tardisLoc.clone().add(xl, 1, zl), EntityType.ARMOR_STAND);
+        this.entityRightDoor = tardisLoc.getWorld().spawnEntity(tardisLoc.clone().add(xr, 1, zr), EntityType.ARMOR_STAND);
+
+        this.entityTardis.setGravity(false);
+        this.entityLeftDoor.setGravity(false);
+        this.entityRightDoor.setGravity(false);
+
+        this.entityTardis.setSilent(true);
+        this.entityLeftDoor.setSilent(true);
+        this.entityRightDoor.setSilent(true);
+
+        this.entityRightDoor.addScoreboardTag("rightdoor");
+        this.entityLeftDoor.addScoreboardTag("leftdoor");
+
+        ItemStack base = new ItemStack(Material.CLAY_BALL);
+        ItemMeta meta = base.getItemMeta();
+        meta.setCustomModelData(121601);
+        base.setItemMeta(meta);
+
+        ItemStack left = new ItemStack(Material.CLAY_BALL);
+        ItemMeta metal = left.getItemMeta();
+        metal.setCustomModelData(121602);
+        left.setItemMeta(metal);
+
+        ItemStack right = new ItemStack(Material.CLAY_BALL);
+        ItemMeta metar = right.getItemMeta();
+        metar.setCustomModelData(121603);
+        right.setItemMeta(metar);
+
+        ((ArmorStand) this.entityTardis).getEquipment().setHelmet(base);
+        ((ArmorStand) this.entityLeftDoor).getEquipment().setHelmet(left);
+        ((ArmorStand) this.entityRightDoor).getEquipment().setHelmet(right);
+
+        this.setNew(false);
+        this.setLanded(true);
+
+        Block upperBlock = this.getTardisLocation().getBlock().getRelative(BlockFace.UP, 2);
+        if(upperBlock.getType().equals(Material.AIR)) upperBlock.setType(Material.BARRIER);
+
+        this.entityTardis.setRotation(angle, 0);
+        this.entityLeftDoor.setRotation(angle, 0);
+        this.entityRightDoor.setRotation(angle, 0);
+
     }
 
     public void generatePlot() {
         Location plotLocation = TardisGenerator.getInstance().generateNewPlot();
         this.setPlotLocation(plotLocation);
+        this.setNew(false);
     }
 
 //    public void resetTardisSkin() { tardisSkin = TardisAppearance.DEFAULT; }

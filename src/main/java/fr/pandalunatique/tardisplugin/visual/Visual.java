@@ -11,7 +11,8 @@ import java.lang.reflect.Method;
 
 public enum Visual {
 
-    ARTRON_CLOUD_VISUAL(ArtronCloudVisual.class);
+    ARTRON_CLOUD_VISUAL(ArtronCloudVisual.class),
+    TARDIS_COLLISION_VISUAL(TardisCollisionVisual.class);
 
     private final Class<?> clazz;
     private final Method getVisualRunnable;

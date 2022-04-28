@@ -21,8 +21,6 @@ public class ConnectionHandleListener implements Listener {
 
         Player p = e.getPlayer();
 
-        p.setResourcePack("https://www.dropbox.com/s/ypi72utybchjuf5/pack.zip?dl=1", DigestUtils.sha1("force"));
-
         TardisPlayer tardisPlayer = Database.getPlayer(p.getUniqueId());
         if(tardisPlayer == null) {
 

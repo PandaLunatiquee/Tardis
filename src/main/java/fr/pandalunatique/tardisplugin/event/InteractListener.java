@@ -9,7 +9,9 @@ import fr.pandalunatique.tardisplugin.world.TardisGenerator;
 import fr.pandalunatique.tardisplugin.world.TardisWorldManager;
 import fr.pandalunatique.tardisplugin.world.artron.ArtronCloud;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -70,9 +72,28 @@ public class InteractListener implements Listener {
 
                         if(tardis != null) {
 
-                            p.sendMessage(TardisGenerator.getInstance().getCurrentLocation().toString());
-                            //tardis.generatePlot();
-                            tardis.setTardisLocation(p.getLocation());
+                            boolean isNew = tardis.isNew();
+                            if (isNew) tardis.generatePlot();
+
+                            if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+
+                                if (!tardis.isPhasing()) {
+
+                                    Location location = e.getClickedBlock().getRelative(BlockFace.UP).getLocation();
+
+                                    if (Tardis.canLandAt(location)) {
+
+                                        tardis.landTardisAt(location);
+                                        tardis.setDoorOpen(true);
+
+                                    }
+                                } else {
+                                    p.sendMessage(ChatColor.RED + "You tardis is currently phasing!");
+                                }
+
+                            } else {
+                                p.sendMessage(ChatColor.RED + "You need to click on a block!");
+                            }
 
                         } else {
                             p.sendMessage(ChatColor.RED + "You don't have any tardis!");

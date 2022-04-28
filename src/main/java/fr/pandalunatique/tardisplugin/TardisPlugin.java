@@ -59,18 +59,18 @@ public class TardisPlugin extends JavaPlugin {
         System.out.println();
 
         // Create plugin folder
-        if(!this.getDataFolder().exists()) {
+        if (!this.getDataFolder().exists()) {
             this.getDataFolder().mkdir(); //TODO: Handle exception
 
             File schematicFolder = new File(this.getDataFolder(), "schematic");
-            if(!schematicFolder.exists()) schematicFolder.mkdir();
+            if (!schematicFolder.exists()) schematicFolder.mkdir();
 
         }
 
         SchematicManager.saveSchematics();
 
         // Connect to database and check if connection if valid, otherwise disable the plugin
-        if(!Database.canConnect()) Bukkit.getPluginManager().disablePlugin(this);
+        if (!Database.canConnect()) Bukkit.getPluginManager().disablePlugin(this);
 
         // Registering main events
         Bukkit.getPluginManager().registerEvents(new ConnectionHandleListener(), this);
@@ -100,11 +100,11 @@ public class TardisPlugin extends JavaPlugin {
             ItemStack i = TardisItem.TARDIS_KEY.getItemStack();
             TardisItem.setSoulbinding(i, player.getUniqueId());
             player.getInventory().addItem(i);
-            if(tardisPlayer != null) {
+            if (tardisPlayer != null) {
 
                 Tardis tardis = Database.getTardis(player.getUniqueId());
 
-                if(tardis != null) TardisRegistry.getRegistry().registerTardis(tardis);
+                if (tardis != null) TardisRegistry.getRegistry().registerTardis(tardis);
                 TardisPlayerRegistry.getRegistry().registerPlayer(tardisPlayer);
 
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a&lProgression! &aYour progression has been loaded successfully!"));
@@ -116,51 +116,7 @@ public class TardisPlugin extends JavaPlugin {
 
         });
 
-
-
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
-
-            for (Tardis tardis : TardisRegistry.getRegistry().getRegistered()) {
-
-                Bukkit.getOnlinePlayers().forEach(player -> {
-
-                    Location ploc = player.getLocation();
-
-                    if(ploc.distance(tardis.getTardisLocation()) < 10) {
-
-                        BlockFace face = BlockFace.valueOf(tardis.getFacing().name());
-                        Location relative = tardis.getTardisLocation().getBlock().getRelative(face).getLocation();
-                        Location relative2 = tardis.getTardisLocation().getBlock().getRelative(face, 2).getLocation();
-
-                       // player.sendMessage("" + (int) ploc.getX() + " " + tardis.getTardisLocation().getX());
-
-                        boolean x = (int) ploc.getX() == (int) relative.getX() || (int) ploc.getX() == (int) tardis.getTardisLocation().getX();
-                        boolean y = (int) ploc.getY() == (int) tardis.getTardisLocation().getY();
-                        boolean z = (int) ploc.getZ() == (int) relative.getZ() || (int) ploc.getZ() == (int) tardis.getTardisLocation().getZ();
-
-                        x = x || (int) ploc.getX() == (int) relative2.getX();
-                        z = z || (int) ploc.getZ() == (int) relative2.getZ();
-
-                        if(x && y && z) {
-
-                            player.sendBlockChange(tardis.getTardisLocation(), Material.AIR.createBlockData());
-                            player.sendBlockChange(tardis.getTardisLocation().getBlock().getRelative(BlockFace.UP).getLocation(), Material.AIR.createBlockData());
-
-                        } else {
-                            player.sendBlockChange(tardis.getTardisLocation(), Material.REDSTONE_BLOCK.createBlockData());
-                            player.sendBlockChange(tardis.getTardisLocation().getBlock().getRelative(BlockFace.UP).getLocation(), Material.REDSTONE_BLOCK.createBlockData());
-                        }
-
-                    }
-
-                });
-
-            }
-
-        } , 0, 5);
-
     }
-
 
     @Override
     public void onDisable() {
