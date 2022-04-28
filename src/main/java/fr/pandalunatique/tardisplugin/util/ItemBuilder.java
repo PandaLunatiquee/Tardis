@@ -3,8 +3,14 @@ package fr.pandalunatique.tardisplugin.util;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import fr.pandalunatique.tardisplugin.item.ModelID;
+import jdk.internal.icu.text.NormalizerBase;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.libs.org.apache.maven.model.Model;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +22,22 @@ import java.util.UUID;
 
 public class ItemBuilder {
 
+    // CustomModels Methods
+    static public ItemStack getModel(@NotNull final ModelID model) { return getModel(model, false); }
+    static public ItemStack getModel(@NotNull final ModelID model, final boolean glint) {
+        final ItemStack is = new ItemStack(model.getMat());
+        final ItemMeta meta = is.getItemMeta();
+        if (glint) is.addEnchantment(Enchantment.LURE, 0);
+        meta.setCustomModelData(model.getCmd());
+
+        is.setItemMeta(meta);
+        return is;
+    }
+
+
+
+
+    // CustomSkulls Methods
     static public ItemStack getCustomSkull(final String texture) { return getCustomSkull(texture, 1, false, " ", null); }
 
     static public ItemStack getCustomSkull(final String texture, final int count) { return getCustomSkull(texture, count, false, " ", null); }
