@@ -84,18 +84,16 @@ public class Scanner implements Listener {
         Location scanPos = scanInit.clone();
         Location holoPos = holoInit.clone();
 
-        //TODO: fix scheduler task L+ratio
         for (int i = 0; i < size + 1; i++) {
             final int finalI = i;
             final Location finalScan = scanPos.clone();
             final Location finalHolo = holoPos.clone();
-            final int finalSize = size;
 
             Bukkit.getScheduler().runTaskLater(TardisPlugin.getInstance(), () -> {
 
-                for (int j = 0; j < finalSize * 2 + 1; j++) {
-                    for (int k = 0; k < finalSize * 2 + 1; k++) {
-                        if (isBlockVisible(finalScan) || k == 0 || k == finalSize * 2 || j == 0 || j == finalSize * 2 || finalI == finalSize) {
+                for (int j = 0; j < size * 2 + 1; j++) {
+                    for (int k = 0; k < size * 2 + 1; k++) {
+                        if (isBlockVisible(finalScan) || k == 0 || k == size * 2 || j == 0 || j == size * 2 || finalI == size) {
                             spawnHologramBlock(finalHolo, finalScan);
                         }
                         finalScan.setX(finalScan.getX() + 1);
@@ -185,7 +183,7 @@ public class Scanner implements Listener {
 
         EntityItem item = new EntityItem(((CraftWorld) pos.getWorld()).getHandle(), 0, 0, 0,
                 CraftItemStack.asNMSCopy(ItemBuilder.getCustomSkull(EntityIcon.fromEntityType(entity.getType()), true)));
-        item.setPosition(itemPos.getX(), itemPos.getY(), itemPos.getZ()); //FIXME: metadata doesn't work
+        item.setPosition(itemPos.getX(), itemPos.getY(), itemPos.getZ());
         item.setNoGravity(true);
         item.setPickupDelay(32767);
         item.setInvulnerable(true);
