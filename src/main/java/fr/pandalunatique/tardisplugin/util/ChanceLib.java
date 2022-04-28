@@ -7,10 +7,10 @@ import java.util.Random;
 
 public class ChanceLib {
 
-    public static boolean chanceOutOf(int chance, int oufOf) {
+    public static boolean chanceOutOf(int chance, int outOf) {
 
         Random r = new Random();
-        int value = r.nextInt(oufOf + 1);
+        int value = r.nextInt(outOf + 1);
         return value < chance;
 
     }
